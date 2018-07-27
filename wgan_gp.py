@@ -15,7 +15,8 @@ from keras.preprocessing import image
 from functools import partial
 
 import keras.backend as K
-
+import matplotlib
+matplotlib.use('PDF')
 import matplotlib.pyplot as plt
 
 import sys
