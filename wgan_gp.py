@@ -11,6 +11,7 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop
+from keras.preprocessing import image
 from functools import partial
 
 import keras.backend as K
@@ -24,7 +25,7 @@ import numpy as np
 class RandomWeightedAverage(_Merge):
     """Provides a (random) weighted average between real and generated image samples"""
     def _merge_function(self, inputs):
-        alpha = K.random_uniform((self.batch_size, 1, 1, 1))
+        alpha = K.random_uniform((32, 1, 1, 1))
         return (alpha * inputs[0]) + ((1 - alpha) * inputs[1])
 
 class WGANGP():
@@ -186,7 +187,7 @@ class WGANGP():
         X_train = X_train[y_train.flatten() == 6]
 
         # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        X_train = (X_train.astype(np.float32)) / 255
         #X_train.reshape()
         #X_train = X_train.reshape(
     #(X_train.shape[0],) + (self.img_rows, self.img_cols, self.channels)).astype('float32') / 255.
@@ -238,7 +239,9 @@ class WGANGP():
         cnt = 0
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
+                #axs[i,j].imshow(gen_imgs[cnt, :,:,0])
+                axs[i,j].imshow(image.array_to_img(gen_imgs[cnt] * 255., scale=False))
+                #axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
         fig.savefig("images/cifar_%d.png" % epoch)
@@ -247,4 +250,4 @@ class WGANGP():
 
 if __name__ == '__main__':
     wgan = WGANGP()
-    wgan.train(epochs=30000, batch_size=self.batch_size, sample_interval=100)
+    wgan.train(epochs=30000, batch_size=32, sample_interval=100)
